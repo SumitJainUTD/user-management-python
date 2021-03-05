@@ -38,3 +38,18 @@ class UserModel:
             if str(u._id) == str(_id):
                 return u
         return None
+
+    @classmethod
+    def delete_user_id(cls, _id):
+        for u in cls.users:
+            if str(u._id) == str(_id):
+                cls.users.remove(u)
+                return True
+        return False
+
+    @classmethod
+    def find_by_email_id(cls, email):
+        for u in cls.users:
+            if u.email == email:
+                return u
+        return None

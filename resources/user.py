@@ -13,13 +13,24 @@ class User(Resource):
         else:
             return {'user': None}, 404
 
+    def delete(self, _id):
+        print("deleting")
+        result = UserModel.delete_user_id(_id)
+        if result:
+            return {'message': "user successfully deleted"}, 200
+        else:
+            return {'message': "user not found"}, 200
+
 
 class UserRegister(Resource):
 
     def post(self):
         data = request.get_json()
         if UserModel.find_by_user_name(data['user_name']):
-            return {"message": "user name already exists"}, 400
+            return {"message": "user name already taken"}, 400
+
+        if UserModel.find_by_email_id(data['email']):
+            return {"message": data['email'] + "email is already registered"}, 400
 
         user = UserModel.add_user(data['user_name'], data['password'], data['email'])
         UserModel.users.append(user)
