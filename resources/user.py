@@ -1,3 +1,5 @@
+import datetime
+
 from flask_restful import Resource
 from flask import request
 
@@ -15,8 +17,9 @@ class User(Resource):
 
     def delete(self, _id):
         print("deleting")
-        result = UserModel.delete_user_id(_id)
-        if result:
+        user = UserModel.find_by_user_id(_id)
+        if user:
+            UserModel.delete_from_db(user)
             return {'message': "user successfully deleted"}, 200
         else:
             return {'message': "user not found"}, 200
@@ -32,8 +35,9 @@ class UserRegister(Resource):
         if UserModel.find_by_email_id(data['email']):
             return {"message": data['email'] + "email is already registered"}, 400
 
-        user = UserModel.add_user(data['user_name'], data['password'], data['email'])
-        UserModel.users.append(user)
+        dt = datetime.datetime.utcnow().strftime("%d-%b-%Y (%H:%M:%S.%f)")
+        user = UserModel(data['user_name'], data['password'], data['email'], dt)
+        user.save_to_db()
         return {"message": user.user_name + " is created"}, 201
 
 
@@ -41,6 +45,6 @@ class UserList(Resource):
 
     def get(self):
         temp_users = []
-        for u in UserModel.users:
+        for u in UserModel.get_all_users():
             temp_users.append(u.json())
         return {'users': temp_users}
