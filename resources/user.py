@@ -1,9 +1,9 @@
 import datetime
-
 from flask_restful import Resource
 from flask import request
-
 from models.user import UserModel
+from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
 
 
 class User(Resource):
@@ -35,8 +35,13 @@ class UserRegister(Resource):
         if UserModel.find_by_email_id(data['email']):
             return {"message": data['email'] + "email is already registered"}, 400
 
+        hashed_password = generate_password_hash(data['password'], method='sha256')
+
+        public_id = str(uuid.uuid4())
+
         dt = datetime.datetime.utcnow().strftime("%d-%b-%Y (%H:%M:%S.%f)")
-        user = UserModel(data['user_name'], data['password'], data['email'], dt)
+        user = UserModel(public_id=public_id, user_name=data['user_name'], password=hashed_password, email=data['email'],
+                         created_at=dt, updated_at=dt, role_id=3)
         user.save_to_db()
         return {"message": user.user_name + " is created"}, 201
 
