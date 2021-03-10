@@ -1,7 +1,7 @@
 from db import db
 
 
-class Role(db.Model):
+class RoleModel(db.Model):
     __tablename__ = 'roles'
 
     _id = db.Column(db.Integer, primary_key=True)
