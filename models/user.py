@@ -1,17 +1,18 @@
 from db import db
+from models.role import RoleModel
 
 
 class UserModel(db.Model):
     __tablename__ = 'users'
 
-    _id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(80), unique=True, nullable=False)
     user_name = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
     created_at = db.Column(db.String(80))
     updated_at = db.Column(db.String(80))
-    role_id = db.Column(db.Integer)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
 
     def __init__(self, public_id, user_name, password, email, created_at, updated_at, role_id):
         self.public_id = public_id
@@ -24,7 +25,7 @@ class UserModel(db.Model):
 
     def json(self):
         return {
-            '_id': self._id,
+            'id': self.id,
             'public_id': self.public_id,
             'user_name': self.user_name,
             'email': self.email,
@@ -46,8 +47,19 @@ class UserModel(db.Model):
         db.session.commit()
 
     @classmethod
-    def find_by_user_id(cls, _id):
-        return cls.query.filter_by(_id=_id).first()
+    def find_by_user_id(cls, id):
+        return cls.query.filter_by(id=id).first()
+
+    @classmethod
+    def check_if_user_is_admin(cls, id):
+        print("id: " +  str(id))
+        user = cls.query.filter_by(id=id).first()
+        print(user)
+        role_id = user.role_id
+        print("role id" + str(role_id))
+        role = RoleModel.find_by_role_id(role_id)
+        if role:
+            return role.is_admin
 
     @classmethod
     def find_by_email_id(cls, email):

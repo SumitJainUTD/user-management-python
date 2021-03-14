@@ -6,8 +6,8 @@ import datetime
 
 class Role(Resource):
 
-    def get(self, _id):
-        role = RoleModel.find_by_role_id(_id)
+    def get(self, id):
+        role = RoleModel.find_by_role_id(id)
         if role:
             return role.json(), 200
         else:
@@ -21,9 +21,9 @@ class RoleAdd(Resource):
         if RoleModel.find_by_role_name(data['role_name']):
             return {"message": "role already exists"}, 400
 
-        dt = datetime.datetime.utcnow().strftime("%d-%b-%Y (%H:%M:%S.%f)")
+        dt = datetime.datetime.utcnow().strftime("%d-%m-%Y %H:%M:%S.%f")
         role = RoleModel(role_name=data['role_name'], description=data['description'],
-                         created_at=dt, updated_at=dt)
+                         created_at=dt, updated_at=dt, is_admin=data['is_admin'])
         role.save_to_db()
         return {"message": role.role_name + " is created"}, 201
 
