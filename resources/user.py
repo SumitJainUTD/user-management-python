@@ -121,7 +121,7 @@ class MakeUserAdmin(Resource):
         result = validate_admin(token)
         if result:
             return {
-                       'message': 'Unauthorized - Need admin privileges'
+                       'message': 'Unauthorized'
                    }, 401
         user = UserModel.find_by_user_id(id)
         if user:
